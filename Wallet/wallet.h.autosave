@@ -1,0 +1,13 @@
+#ifndef WALLET_H
+#define WALLET_H
+
+#include <QByteArray>
+#include <QPair>
+
+struct Wallet
+{
+    uint64_t m_ballance;
+    QPair<QByteArray, QB
+};
+
+#endif // WALLET_H
