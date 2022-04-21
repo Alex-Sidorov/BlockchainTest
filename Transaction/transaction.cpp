@@ -2,6 +2,15 @@
 
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDateTime>
+
+void Transaction::signTransaction(Transaction &transaction, const Wallet &senderWallet)
+{
+    transaction.m_input.m_addr = senderWallet.m_publicKey;
+    transaction.m_input.m_amount = senderWallet.m_ballance;
+    transaction.m_input.m_timestamp = QDateTime::currentMSecsSinceEpoch();
+    //transaction.m_input.m_signature = sign(transaction.outputJSON());
+}
 
 Transaction Transaction::createTransaction(const Wallet &senderWallet, const QByteArray &recipient, uint64_t amount)
 {
@@ -17,9 +26,10 @@ Transaction Transaction::createTransaction(const Wallet &senderWallet, const QBy
     secondRecord.m_amount = amount;
     secondRecord.m_addr =  recipient;
 
-    transaction.m_output = {firstRecord, secondRecord};
+    transaction.m_output.push_back(firstRecord);
+    transaction.m_output.push_back(secondRecord);
 
-    transaction.m_input = {};//TODO
+    signTransaction(transaction, senderWallet);
     transaction.m_id = 1; //TODO
     return transaction;
 }

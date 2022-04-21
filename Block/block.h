@@ -61,7 +61,7 @@ struct Block
 private:
     static inline uint32_t MIME_RATE = 10000; //3 sec
 
-    static uint16_t adjustDifficulty(const Block &prev_block, quint64 time)
+    static uint16_t adjustDifficulty(const Block &prev_block, uint64_t time)
     {
         return prev_block.m_difficulty + (prev_block.m_time + MIME_RATE > time ? 1 : - 1);
     }
