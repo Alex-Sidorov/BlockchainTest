@@ -1,6 +1,6 @@
 QT -= gui
 
-CONFIG += c++11 console
+CONFIG += c++11 c++17 console
 CONFIG -= app_bundle
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -10,6 +10,10 @@ CONFIG -= app_bundle
 SOURCES += \
         Block\blockchain.cpp \
         Transaction/transaction.cpp \
+        Utility/BigInt/bigint.cpp \
+        Utility/BigInt/mini-gmp.c \
+        Utility/RsaEncryption/qrsaencryption.cpp \
+        Utility/utility.cpp \
         main.cpp
 
 # Default rules for deployment.
@@ -21,4 +25,10 @@ HEADERS += \
     Block\block.h \
     Block\blockchain.h \
     Transaction/transaction.h \
+    Utility/BigInt/bigint.h \
+    Utility/BigInt/mini-gmp.h \
+    Utility/BigInt/minigmp_global.h \
+    Utility/RsaEncryption/qrsaencryption.h \
+    Utility/RsaEncryption/qtsecret_global.h \
+    Utility/utility.h \
     Wallet/wallet.h

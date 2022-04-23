@@ -25,6 +25,10 @@ struct Transaction
                                          const QByteArray& recipient,
                                          uint64_t amount);
 
+    bool update(const Wallet& senderWallet,
+                const QByteArray& recipient,
+                uint64_t amount);
+
     QJsonDocument inputJSON() const;
     QJsonDocument outputJSON() const;
 
