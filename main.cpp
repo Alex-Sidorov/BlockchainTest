@@ -2,7 +2,8 @@
 #include <iostream>
 
 #include "Block\blockchain.h"
-#include "Transaction/Transaction.h"
+#include "Transaction/transaction.h"
+#include "Transaction/transactionpool.h"
 #include "Utility/utility.h"
 
 int main(int argc, char *argv[])
@@ -24,10 +25,22 @@ int main(int argc, char *argv[])
     wallet.m_pairKeys = utility_blockchain::getKeys();
     wallet.m_publicKey = wallet.m_pairKeys.first;
 
-    auto tr = Transaction::createTransaction(wallet, "qwerttre", 100);
-    tr.update(wallet, "qwerttre", 10);
+    Wallet wallet2;
+    wallet2.m_ballance = 100;
+    wallet2.m_pairKeys = utility_blockchain::getKeys();
+    wallet2.m_publicKey = wallet2.m_pairKeys.first;
 
-    std::cout << "Check Signature: " << (utility_blockchain::verifyTransaction(tr) ? "true" : "false") << std::endl;
+    TransactionPool pool;
+
+    wallet.createTransaction(pool, "qwerttre", 100);
+    wallet.createTransaction(pool, "qwerttre", 10);
+
+
+    wallet2.createTransaction(pool, "qwerttre", 10);
+
+    pool.toJson();
+
+    std::cout << "Check pool: " << (pool.verifyTransactions() ? "True" : "False");
 
     return a.exec();
 }

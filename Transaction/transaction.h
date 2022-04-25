@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 
 #include "Wallet/wallet.h"
+
 struct Transaction
 {
 
@@ -29,12 +30,16 @@ struct Transaction
                 const QByteArray& recipient,
                 uint64_t amount);
 
+    Transaction &operator=(const Transaction &transaction);
+
     QJsonDocument inputJSON() const;
     QJsonDocument outputJSON() const;
 
+    QJsonDocument toJson() const;
+
     InputTransactionBody m_input;
     std::vector<TransactionBody> m_output;
-    uint64_t m_id = 0;
+    QByteArray m_id;
 
 };
 

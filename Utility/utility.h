@@ -13,6 +13,8 @@ namespace utility_blockchain
     QByteArray sign(const QByteArray& data, const QByteArray &privKey);
 
     bool verifyTransaction(const Transaction& transaction);
+
+    QByteArray uuid();
 }
 
 #endif

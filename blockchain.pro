@@ -10,10 +10,12 @@ CONFIG -= app_bundle
 SOURCES += \
         Block\blockchain.cpp \
         Transaction/transaction.cpp \
+        Transaction/transactionpool.cpp \
         Utility/BigInt/bigint.cpp \
         Utility/BigInt/mini-gmp.c \
         Utility/RsaEncryption/qrsaencryption.cpp \
         Utility/utility.cpp \
+        Wallet/wallet.cpp \
         main.cpp
 
 # Default rules for deployment.
@@ -25,6 +27,7 @@ HEADERS += \
     Block\block.h \
     Block\blockchain.h \
     Transaction/transaction.h \
+    Transaction/transactionpool.h \
     Utility/BigInt/bigint.h \
     Utility/BigInt/mini-gmp.h \
     Utility/BigInt/minigmp_global.h \

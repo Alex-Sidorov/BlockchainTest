@@ -1,6 +1,8 @@
 #include "utility.h"
 #include "RsaEncryption/qrsaencryption.h"
 
+#include <QUuid>
+
 QPair<QByteArray, QByteArray> utility_blockchain::getKeys()
 {
     QRSAEncryption rsa;
@@ -20,4 +22,9 @@ bool utility_blockchain::verifyTransaction(const Transaction& transaction)
                                             transaction.m_input.m_signature,
                                             transaction.m_input.m_addr,
                                             QRSAEncryption::RSA_2048);
+}
+
+QByteArray utility_blockchain::uuid()
+{
+    return QUuid::createUuid().toByteArray();
 }

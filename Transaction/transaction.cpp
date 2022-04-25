@@ -33,7 +33,7 @@ Transaction Transaction::createTransaction(const Wallet &senderWallet, const QBy
     transaction.m_output.push_back(secondRecord);
 
     signTransaction(transaction, senderWallet);
-    transaction.m_id = 1; //TODO
+    transaction.m_id = utility_blockchain::uuid();
     return transaction;
 }
 
@@ -60,6 +60,14 @@ bool Transaction::update(const Wallet &senderWallet, const QByteArray &recipient
     return true;
 }
 
+Transaction &Transaction::operator=(const Transaction &transaction)
+{
+    m_input = transaction.m_input;
+    m_output = transaction.m_output;
+    m_id = transaction.m_id;
+    return *this;
+}
+
 QJsonDocument Transaction::inputJSON() const
 {
     QJsonObject json
@@ -83,4 +91,13 @@ QJsonDocument Transaction::outputJSON() const
         array.push_back(obj);
     }
     return QJsonDocument(array);
+}
+
+QJsonDocument Transaction::toJson() const
+{
+    QJsonObject json;
+    json.insert("id", QJsonValue::fromVariant(QVariant::fromValue(m_id)));
+    json.insert("input", inputJSON().object());
+    json.insert("output", QJsonValue(outputJSON().array()));
+    return QJsonDocument(json);
 }
