@@ -1,5 +1,6 @@
 #include "utility.h"
 #include "RsaEncryption/qrsaencryption.h"
+#include "../Transaction/transaction.h"
 
 #include <QUuid>
 

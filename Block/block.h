@@ -4,7 +4,15 @@
 #include <QByteArray>
 #include <QCryptographicHash>
 #include <QDateTime>
-#include <QDebug>
+#include <vector>
+
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonArray>
+#include <QVariant>
+#include <QJsonDocument>
+
+#include "Transaction/transaction.h"
 
 struct Block
 {
@@ -50,6 +58,26 @@ struct Block
         return block;
     }
 
+    QJsonDocument toJson() const
+    {
+        QJsonObject object;
+        object.insert("time", QJsonValue::fromVariant(QVariant::fromValue(m_time)));
+        object.insert("difficulty", QJsonValue::fromVariant(QVariant::fromValue(m_difficulty)));
+        object.insert("nonce", QJsonValue::fromVariant(QVariant::fromValue(m_nonce)));
+        object.insert("hash", QJsonValue::fromVariant(QVariant::fromValue(m_hash)));
+        object.insert("prevHash", QJsonValue::fromVariant(QVariant::fromValue(m_prevHash)));
+        object.insert("data", QJsonValue(QJsonDocument::fromJson(m_data).array()));
+        return QJsonDocument(object);
+    }
+
+    std::vector<Transaction> getTransactions() const
+    {
+        std::vector<Transaction> transactions;
+        auto array = QJsonDocument::fromJson(m_data).array();
+        for(auto item : array)
+            transactions.push_back(Transaction::createTransaction(item.toObject()));
+        return transactions;
+    }
 
     QByteArray m_data;
     QByteArray m_hash;

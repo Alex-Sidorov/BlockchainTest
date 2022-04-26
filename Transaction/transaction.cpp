@@ -1,6 +1,8 @@
 #include "transaction.h"
 #include "Utility/utility.h"
+#include "Wallet/wallet.h"
 
+#include <QVariant>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
@@ -10,7 +12,7 @@
 void Transaction::signTransaction(Transaction &transaction, const Wallet &senderWallet)
 {
     transaction.m_input.m_addr = senderWallet.m_publicKey;
-    transaction.m_input.m_amount = senderWallet.m_ballance;
+    transaction.m_input.m_amount = senderWallet.m_balance;
     transaction.m_input.m_timestamp = QDateTime::currentMSecsSinceEpoch();
     transaction.m_input.m_signature = utility_blockchain::sign(transaction.outputJSON().toBinaryData(), senderWallet.m_pairKeys.second);
 }
@@ -18,11 +20,11 @@ void Transaction::signTransaction(Transaction &transaction, const Wallet &sender
 Transaction Transaction::createTransaction(const Wallet &senderWallet, const QByteArray &recipient, uint64_t amount)
 {
     Transaction transaction;
-    if(senderWallet.m_ballance < amount)
+    if(senderWallet.m_balance < amount)
         return transaction;
 
     Transaction::TransactionBody firstRecord;
-    firstRecord.m_amount = senderWallet.m_ballance - amount;
+    firstRecord.m_amount = senderWallet.m_balance - amount;
     firstRecord.m_addr =  senderWallet.m_publicKey;
 
     Transaction::TransactionBody secondRecord;
@@ -32,9 +34,58 @@ Transaction Transaction::createTransaction(const Wallet &senderWallet, const QBy
     transaction.m_output.push_back(firstRecord);
     transaction.m_output.push_back(secondRecord);
 
-    signTransaction(transaction, senderWallet);
     transaction.m_id = utility_blockchain::uuid();
+
+    signTransaction(transaction, senderWallet);
     return transaction;
+}
+
+Transaction Transaction::createTransaction(const Wallet &senderWallet, const std::vector<TransactionBody> &output)
+{
+    Transaction transaction;
+
+    transaction.m_id = utility_blockchain::uuid();
+    transaction.m_output = output;
+
+    signTransaction(transaction, senderWallet);
+
+    return transaction;
+}
+
+Transaction Transaction::createTransaction(const QJsonObject &obj)
+{
+    Transaction transaction;
+
+    transaction.m_id = obj["id"].toVariant().toByteArray();
+
+    auto input = obj["input"].toObject();
+
+    transaction.m_input.m_addr = input["address"].toVariant().toByteArray();
+    transaction.m_input.m_amount = input["amount"].toVariant().toULongLong();
+    transaction.m_input.m_signature = input["signature"].toVariant().toByteArray();
+    transaction.m_input.m_timestamp = input["timestamp"].toVariant().toULongLong();
+
+
+    QJsonArray array = obj["output"].toArray();
+    transaction.m_output.reserve(array.size());
+    for(const auto& item : array)
+    {
+        auto body = item.toObject();
+        transaction.m_output.push_back(TransactionBody());
+        transaction.m_output.back().m_addr = body["address"].toVariant().toByteArray();
+        transaction.m_output.back().m_amount = body["amount"].toVariant().toULongLong();
+    }
+    return transaction;
+};
+
+Transaction Transaction::rewardTransaction(const Wallet &minerWallet,
+                                           const Wallet &blockchainWallet,
+                                           uint64_t reward)
+{
+    Transaction::TransactionBody record;
+    record.m_amount = reward;
+    record.m_addr = minerWallet.m_publicKey;
+    return createTransaction(blockchainWallet, {record});
 }
 
 bool Transaction::update(const Wallet &senderWallet, const QByteArray &recipient, uint64_t amount)

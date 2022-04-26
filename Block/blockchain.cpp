@@ -1,4 +1,7 @@
 #include "blockchain.h"
+#include "Transaction/transaction.h"
+
+#include <QJsonArray>
 
 BlockChain::BlockChain(bool isEmpty)
 {
@@ -40,6 +43,26 @@ Block* BlockChain::addBlockIfCorrect(const QByteArray &data)
         return nullptr;
     else
         return addBlock(data);
+}
+
+std::vector<Transaction> BlockChain::getTransactions() const
+{
+    std::vector<Transaction> transactions;
+    for(const auto &item : m_blockchain)
+    {
+        auto temp = item.getTransactions();
+        std::move(temp.begin(), temp.end(), std::back_inserter(transactions));
+    }
+    return transactions;
+}
+
+QJsonDocument BlockChain::toJson() const
+{
+    QJsonArray array;
+    for(const auto &item : m_blockchain)
+        array.append(item.toJson().toVariant().toJsonValue());
+
+    return QJsonDocument(array);
 }
 
 QString BlockChain::getString() const

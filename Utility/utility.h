@@ -1,10 +1,10 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-#include "../Transaction/transaction.h"
-
 #include <QPair>
 #include <QByteArray>
+
+struct Transaction;
 
 namespace utility_blockchain
 {

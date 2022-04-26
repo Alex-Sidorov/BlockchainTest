@@ -2,18 +2,13 @@
 #include "Utility/utility.h"
 
 #include <QJsonArray>
-#include <QFile>
 #include <algorithm>
 
 TransactionPool::TransactionPool()
-{
-
-}
+{}
 
 TransactionPool::~TransactionPool()
-{
-
-}
+{}
 
 Transaction* TransactionPool::updateOrAddTransaction(const Transaction& transaction)
 {
@@ -50,20 +45,50 @@ Transaction* TransactionPool::findById(const QByteArray &id)
 
 QJsonDocument TransactionPool::toJson() const
 {
+    return toJson(m_transactions);
+}
+
+QJsonDocument TransactionPool::toJson(const std::vector<Transaction>& transactions)
+{
     QJsonArray array;
-    for(const auto &item : m_transactions)
+    for(const auto &item : transactions)
         array.append(item.toJson().toVariant().toJsonValue());
 
-    QFile f("temp.json");
-    f.open(QIODevice::WriteOnly);
-    f.write(QJsonDocument(array).toJson());
     return QJsonDocument(array);
+}
+
+bool TransactionPool::verifyTransaction(const Transaction& transaction) const
+{
+    uint64_t total = 0;
+    for(auto& item : transaction.m_output)
+        total += item.m_amount;
+
+    return transaction.m_input.m_amount == total
+            && utility_blockchain::verifyTransaction(transaction);
 }
 
 bool TransactionPool::verifyTransactions() const
 {
     for(const auto &item : m_transactions)
-        if(!utility_blockchain::verifyTransaction(item))
+        if(!verifyTransaction(item))
             return false;
+
     return true;
+}
+
+std::vector<Transaction> TransactionPool::validTransactions()
+{
+    std::vector<Transaction> transactions;
+    transactions.reserve(m_transactions.size());
+
+    for(auto &item : m_transactions)
+        if(verifyTransaction(item))
+            transactions.push_back(item);
+
+    return transactions;
+}
+
+void TransactionPool::clear()
+{
+    m_transactions.clear();
 }

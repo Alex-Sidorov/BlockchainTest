@@ -3,6 +3,10 @@
 
 #include "block.h"
 
+#include <QJsonDocument>
+
+struct Transaction;
+
 class BlockChain
 {
 
@@ -16,6 +20,10 @@ public:
 
     bool checkBlockChain() const;
     Block* addBlockIfCorrect(const QByteArray &data);
+
+    std::vector<Transaction> getTransactions() const;
+
+    QJsonDocument toJson() const;
 
     QString getString() const;
 

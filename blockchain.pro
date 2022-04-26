@@ -9,6 +9,7 @@ CONFIG -= app_bundle
 
 SOURCES += \
         Block\blockchain.cpp \
+        Miner/miner.cpp \
         Transaction/transaction.cpp \
         Transaction/transactionpool.cpp \
         Utility/BigInt/bigint.cpp \
@@ -26,6 +27,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Block\block.h \
     Block\blockchain.h \
+    Miner/miner.h \
     Transaction/transaction.h \
     Transaction/transactionpool.h \
     Utility/BigInt/bigint.h \

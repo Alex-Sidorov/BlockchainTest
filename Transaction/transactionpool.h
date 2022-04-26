@@ -16,9 +16,14 @@ public:
     Transaction* find(const QByteArray &pubKey);
     Transaction* findById(const QByteArray &id);
 
-    QJsonDocument toJson() const;
+    QJsonDocument toJson() const;    
+
+    static QJsonDocument toJson(const std::vector<Transaction>& transactions);
 
     bool verifyTransactions() const;
+    std::vector<Transaction> validTransactions();
+
+    void clear();
 
 private:
     std::vector<Transaction> m_transactions;
@@ -30,6 +35,7 @@ private:
         return containTransaction != m_transactions.end() ? &(*containTransaction) : nullptr;
     }
 
+    bool verifyTransaction(const Transaction& transaction) const;
 };
 
 #endif // TRANSACTIONPOOL_H
