@@ -18,9 +18,9 @@ Block* Miner::mine()
         return nullptr;
 
     auto validTransactions = m_pool->validTransactions();
-    validTransactions.push_back(Transaction::rewardTransaction(*m_wallet, Wallet::blockChainWallet()));
+    validTransactions.push_back(Transaction::rewardTransaction(*m_wallet, m_blockchainWallet));
 
-    auto block = m_blockchain->addBlock(TransactionPool::toJson(validTransactions).toJson());
+    auto block = m_blockchain->addBlock(validTransactions);
 
     m_pool->clear();
     //TODO sync with any nodes

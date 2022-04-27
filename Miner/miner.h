@@ -18,6 +18,9 @@ private:
     BlockChain* m_blockchain;
     TransactionPool* m_pool;
     Wallet* m_wallet;
+
+    //TEST
+    static inline Wallet m_blockchainWallet = Wallet::blockChainWallet();
 };
 
 #endif // MINER_H

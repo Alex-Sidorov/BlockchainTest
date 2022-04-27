@@ -12,6 +12,7 @@
 #include <QVariant>
 #include <QJsonDocument>
 
+#include "Transaction/transactionpool.h"
 #include "Transaction/transaction.h"
 
 struct Block
@@ -47,13 +48,40 @@ struct Block
         return block;
     }
 
+    static Block mineBlock(const std::vector<Transaction>& data, const Block& prev_block)
+    {
+        QCryptographicHash crypto(QCryptographicHash::Sha256);
+        Block block;
+        block.m_transactions = data;
+        block.m_data = TransactionPool::toJson(data).toJson();
+        block.m_prevHash = prev_block.m_hash;
+
+        do
+        {
+            block.m_nonce += 1;
+            block.m_time = QDateTime::currentMSecsSinceEpoch();
+            block.m_difficulty = Block::adjustDifficulty(prev_block, block.m_time);
+
+            calcAndSetHash(block);
+
+        }while(block.m_hash.mid(0, block.m_difficulty).count('0') != block.m_difficulty);
+
+        return block;
+    }
+
     static Block createGeneric()
     {
         Block block;
         block.m_data = "-----";
-        block.m_time = QDateTime::currentMSecsSinceEpoch();
 
-        calcAndSetHash(block);
+        do
+        {
+            block.m_time = QDateTime::currentMSecsSinceEpoch();
+            block.m_nonce += 1;
+            block.m_time = QDateTime::currentMSecsSinceEpoch();
+            calcAndSetHash(block);
+
+        }while(block.m_hash.mid(0, block.m_difficulty).count('0') != block.m_difficulty);
 
         return block;
     }
@@ -70,13 +98,9 @@ struct Block
         return QJsonDocument(object);
     }
 
-    std::vector<Transaction> getTransactions() const
+    const std::vector<Transaction>& getTransactions() const
     {
-        std::vector<Transaction> transactions;
-        auto array = QJsonDocument::fromJson(m_data).array();
-        for(auto item : array)
-            transactions.push_back(Transaction::createTransaction(item.toObject()));
-        return transactions;
+        return m_transactions;
     }
 
     QByteArray m_data;
@@ -86,12 +110,19 @@ struct Block
     uint64_t m_nonce = 0;
     uint16_t m_difficulty = 2;
 
+    std::vector<Transaction> m_transactions;
+
 private:
     static inline uint32_t MIME_RATE = 10000; //3 sec
 
     static uint16_t adjustDifficulty(const Block &prev_block, uint64_t time)
     {
-        return prev_block.m_difficulty + (prev_block.m_time + MIME_RATE > time ? 1 : - 1);
+        if(prev_block.m_time + MIME_RATE > time)
+            return prev_block.m_difficulty + 1;
+        else if(prev_block.m_difficulty - 1)
+            return prev_block.m_difficulty - 1;
+        else
+            return prev_block.m_difficulty;
     }
 
     static void calcAndSetHash(Block &block)

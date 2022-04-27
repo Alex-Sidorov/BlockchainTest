@@ -17,6 +17,7 @@ public:
     virtual ~BlockChain();
 
     Block* addBlock(const QByteArray &data);
+    Block* addBlock(const std::vector<Transaction> &data);
 
     bool checkBlockChain() const;
     Block* addBlockIfCorrect(const QByteArray &data);

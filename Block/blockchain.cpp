@@ -27,6 +27,15 @@ Block* BlockChain::addBlock(const QByteArray &data)
     return &m_blockchain.back();
 }
 
+Block *BlockChain::addBlock(const std::vector<Transaction> &data)
+{
+    if(m_blockchain.empty())
+        return nullptr;
+
+    m_blockchain.push_back(Block::mineBlock(data, m_blockchain.back()));
+    return &m_blockchain.back();
+}
+
 bool BlockChain::checkBlockChain() const
 {
     for(size_t i = 1; i < m_blockchain.size(); ++i)

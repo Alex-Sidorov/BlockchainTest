@@ -28,21 +28,25 @@ int main(int argc, char *argv[])
 
     TransactionPool pool;
 
-    wallet.createTransaction(pool, "qwerttre", 100);
-    wallet.createTransaction(pool, "qwerttre", 10);
-
-
-    wallet2.createTransaction(pool, "qwerttre", 10);
 
     Miner miner(&blockchain, &pool, &wallet);
-    auto block = miner.mine();
+    Miner miner2(&blockchain, &pool, &wallet2);
+
+    wallet.createTransaction(pool, blockchain, "qwerttre", 100);
+    miner.mine();
+    wallet.createTransaction(pool, blockchain, "qwerttre", 10);
+    miner2.mine();
+
+
+    wallet2.createTransaction(pool, blockchain, "qwerttre", 10);
+    miner.mine();
 
     QFile file("temp2.json");
     file.open(QIODevice::WriteOnly);
     file.write(blockchain.toJson().toJson());
+    file.close();
 
-    std::cout << "Check pool: " << (pool.verifyTransactions() ? "True" : "False") << std::endl;
-    std::cout << "Count valid transactions: " << pool.validTransactions().size();
+    std::cout << "Check BlokChain: " << (blockchain.checkBlockChain() ?  "True" : "False");
 
     return a.exec();
 }

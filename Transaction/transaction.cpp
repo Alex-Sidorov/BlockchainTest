@@ -60,7 +60,7 @@ Transaction Transaction::createTransaction(const QJsonObject &obj)
 
     auto input = obj["input"].toObject();
 
-    transaction.m_input.m_addr = input["address"].toVariant().toByteArray();
+    transaction.m_input.m_addr = QByteArray::fromHex(input["address"].toVariant().toByteArray());
     transaction.m_input.m_amount = input["amount"].toVariant().toULongLong();
     transaction.m_input.m_signature = input["signature"].toVariant().toByteArray();
     transaction.m_input.m_timestamp = input["timestamp"].toVariant().toULongLong();
@@ -72,7 +72,7 @@ Transaction Transaction::createTransaction(const QJsonObject &obj)
     {
         auto body = item.toObject();
         transaction.m_output.push_back(TransactionBody());
-        transaction.m_output.back().m_addr = body["address"].toVariant().toByteArray();
+        transaction.m_output.back().m_addr = QByteArray::fromHex(body["address"].toVariant().toByteArray());
         transaction.m_output.back().m_amount = body["amount"].toVariant().toULongLong();
     }
     return transaction;
@@ -124,7 +124,7 @@ QJsonDocument Transaction::inputJSON() const
     QJsonObject json
     {
         {"amount", QJsonValue::fromVariant(QVariant::fromValue(m_input.m_amount))},
-        {"address", QJsonValue::fromVariant(QVariant::fromValue(m_input.m_addr))},
+        {"address", QJsonValue::fromVariant(QVariant::fromValue(m_input.m_addr.toHex()))},
         {"signature", QJsonValue::fromVariant(QVariant::fromValue(m_input.m_signature))},
         {"timestamp", QJsonValue::fromVariant(QVariant::fromValue(m_input.m_timestamp))}
     };
@@ -138,7 +138,7 @@ QJsonDocument Transaction::outputJSON() const
     {
         QJsonObject obj;
         obj.insert("amount",QJsonValue::fromVariant(QVariant::fromValue(item.m_amount)));
-        obj.insert("address",QJsonValue::fromVariant(QVariant::fromValue(item.m_addr)));
+        obj.insert("address",QJsonValue::fromVariant(QVariant::fromValue(item.m_addr.toHex())));
         array.push_back(obj);
     }
     return QJsonDocument(array);

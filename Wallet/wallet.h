@@ -18,9 +18,7 @@ struct Wallet
     QByteArray m_publicKey;
     uint64_t m_balance;
 
-    QString toString() const;
-
-    void calcBalance(const BlockChain& blockChain);
+    QPair<uint64_t, bool> calcBalance(const BlockChain& blockChain);
 
     //TEST
     static Wallet blockChainWallet()
@@ -34,6 +32,7 @@ struct Wallet
 
 
     Transaction* createTransaction(TransactionPool& pool,
+                                   const BlockChain &blockChain,
                                    const QByteArray& recipient,
                                    uint64_t amount);
 };
